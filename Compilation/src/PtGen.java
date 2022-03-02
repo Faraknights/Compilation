@@ -132,6 +132,8 @@ public class PtGen {
     // bc = bloc courant (=1 si le bloc courant est le programme principal)
 	private static int it, bc;
 	
+	private static int iterateurDesVariables;
+	
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
 	 * 
@@ -197,6 +199,8 @@ public class PtGen {
 		it = 0;
 		bc = 1;
 		
+		iterateurDesVariables = 0;
+		
 		// pile des reprises pour compilation des branchements en avant
 		pileRep = new TPileRep(); 
 		// programme objet = code Mapile de l'unite en cours de compilation
@@ -217,16 +221,73 @@ public class PtGen {
 	 *  -----------------------------------------
 	 * @param numGen : numero du point de generation a executer
 	 */
+	
+	
 	public static void pt(int numGen) {
 	
 		switch (numGen) {
-		case 0:
-			initialisations();
-			break;
-
-                case 255 : 
-			afftabSymb(); // affichage de la table des symboles en fin de compilation
-			break;
+			case 0:
+				initialisations();
+				break;
+			// CONSTANTES
+			case 1: 
+				if(presentIdent(bc) != 0) {
+					UtilLex.messErr("Identifiant déjà utilisé");
+				}
+				break;
+			case 2: 
+				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, UtilLex.valEnt);
+				break;
+			// VARIABLES
+			case 3: 
+				if(presentIdent(bc) != 0) {
+					UtilLex.messErr("Identifiant déjà utilisé");
+				} else {
+					placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, iterateurDesVariables);
+				}
+				break;
+			// TYPES
+			case 4: 
+				tCour = ENT;
+				break;
+			case 5: 
+				tCour = BOOL;
+				break;
+			// VALEUR
+			case 6: 
+				vCour = UtilLex.valEnt;
+				tCour = ENT;
+				break;
+			case 7: 
+				vCour = -1*UtilLex.valEnt;
+				tCour = ENT;
+				break;
+			case 8: 
+				vCour = VRAI;
+				tCour = BOOL;
+				break;
+			case 9: 
+				vCour = FAUX;
+				tCour = BOOL;
+				break;
+			// PRIMAIRE
+			case 10: 
+				int idIdent = presentIdent(bc);
+				if(idIdent == 0) {
+					UtilLex.messErr("Identifiant inconnu");
+				}
+				tCour = tabSymb[idIdent].type;
+				vCour = tabSymb[idIdent].info;
+				break;
+			// EXP5
+			case 11: 
+				if(tCour != ENT) {
+					UtilLex.messErr("Le type attendu pour cette expression est un type ENT");
+				}
+				break;
+            case 255 :
+            	afftabSymb(); // affichage de la table des symboles en fin de compilation
+            	break;
 
 		// TODO
 		
