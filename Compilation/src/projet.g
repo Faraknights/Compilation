@@ -67,7 +67,7 @@ specif  : ident  ( 'fixe' '(' type  ( ',' type  )* ')' )?
 consts  : 'const' ( ident {PtGen2.pt(1);} '=' valeur  ptvg  )+ 
   ;
   
-vars  : 'var' ( type ident {PtGen2.pt(3);} ( ','  ident {PtGen2.pt(3);} )* ptvg  )+
+vars  : 'var' ( type ident {PtGen2.pt(3);} ( ','  ident {PtGen2.pt(3);} )* {PtGen2.pt(27);} ptvg  )+
   ;
   
 type  : 'ent'  {PtGen2.pt(4);}
@@ -136,46 +136,46 @@ affouappel
             |   (effixes (effmods)?)?  
            )
   ;
-  
+   
 effixes : '(' (expression  (',' expression  )*)? ')'
   ;
   
 effmods :'(' (ident  (',' ident  )*)? ')'
   ; 
   
-expression: (exp1) ('ou'  exp1  )*
+expression: (exp1) ('ou' {PtGen2.pt(23);} exp1 {PtGen2.pt(23);} {PtGen2.pt(26);} )*
   ;
   
-exp1  : exp2 ('et'  exp2  )*
+exp1  : exp2 ('et' {PtGen2.pt(23);}  exp2 {PtGen2.pt(23);} {PtGen2.pt(25);})*
   ;
   
-exp2  : 'non' exp2 
+exp2  : 'non' exp2 {PtGen2.pt(23);} {PtGen2.pt(24);} 
   | exp3  
   ;
   
 exp3  : exp4 
-  ( '='   exp4 
-  | '<>'  exp4 
-  | '>'   exp4 
-  | '>='  exp4 
-  | '<'   exp4 
-  | '<='  exp4  
+  ( '='  {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(17);}
+  | '<>' {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(18);}
+  | '>'  {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(19);}
+  | '>=' {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(20);}
+  | '<'  {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(21);}
+  | '<=' {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(22);}
   ) ?
   ;
   
 exp4  : exp5 
-        ('+'  exp5 
-        |'-'  exp5 
+        ('+' {PtGen2.pt(12);} exp5 {PtGen2.pt(12);} {PtGen2.pt(15);}
+        |'-' {PtGen2.pt(12);} exp5 {PtGen2.pt(12);} {PtGen2.pt(16);}
         )*
   ;
   
-exp5  : primaire  {PtGen2.pt(11);}
-        (    '*'   primaire  {PtGen2.pt(11);}
-          | 'div'  primaire  {PtGen2.pt(11);}
+exp5  : primaire  
+        (    '*' {PtGen2.pt(12);}   primaire  {PtGen2.pt(12);} {PtGen2.pt(13);}
+          | 'div' {PtGen2.pt(12);}  primaire  {PtGen2.pt(12);} {PtGen2.pt(14);}
         )*
   ;
   
-primaire: valeur 
+primaire: valeur {PtGen2.pt(11);}
   | ident  {PtGen2.pt(10);}
   | '(' expression ')'
   ;

@@ -73,7 +73,7 @@ public class PtGen {
 		if (tCour != ENT)
 			UtilLex.messErr("expression entiere attendue");
 	}
-	/**
+	/**DIV
 	 * verification du type booleen de l'expression en cours de compilation 
 	 * (arret de la compilation sinon)
 	 */
@@ -232,19 +232,24 @@ public class PtGen {
 			// CONSTANTES
 			case 1: 
 				if(presentIdent(bc) != 0) {
-					UtilLex.messErr("Identifiant déjà utilisé");
+					UtilLex.messErr("Identifiant deja utilise");
 				}
-				break;
+				break; 
 			case 2: 
 				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, UtilLex.valEnt);
 				break;
 			// VARIABLES
 			case 3: 
 				if(presentIdent(bc) != 0) {
-					UtilLex.messErr("Identifiant déjà utilisé");
+					UtilLex.messErr("Identifiant deja utilise");
 				} else {
-					placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, iterateurDesVariables);
+					placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, iterateurDesVariables);
 				}
+				iterateurDesVariables++;
+				break;
+			case 27: 
+				po.produire(RESERVER);
+				po.produire(iterateurDesVariables);
 				break;
 			// TYPES
 			case 4: 
@@ -277,13 +282,80 @@ public class PtGen {
 					UtilLex.messErr("Identifiant inconnu");
 				}
 				tCour = tabSymb[idIdent].type;
-				vCour = tabSymb[idIdent].info;
+				po.produire(CONTENUG);
+				po.produire(tabSymb[idIdent].info);
+				break;
+			case 11: 
+				po.produire(EMPILER);
+				po.produire(vCour);
 				break;
 			// EXP5
-			case 11: 
+			case 12: 
 				if(tCour != ENT) {
-					UtilLex.messErr("Le type attendu pour cette expression est un type ENT");
+					UtilLex.messErr("Mauvais type, type attendu : ENT.");
 				}
+				break;
+			case 13: 
+				po.produire(MUL);
+				tCour = ENT;
+				break;
+			case 14: 
+				po.produire(DIV);
+				tCour = ENT;
+				break;
+			// EXP4
+			case 15: 
+				po.produire(ADD);
+				tCour = ENT;
+				break;
+			case 16: 
+				po.produire(SOUS);
+				tCour = ENT;
+				break;
+			// EXP3
+			case 17: 
+				po.produire(EG);
+				tCour = BOOL;
+				break;
+			case 18: 
+				po.produire(DIFF);
+				tCour = BOOL;
+				break;
+			case 19: 
+				po.produire(SUP);
+				tCour = BOOL;
+				break;
+			case 20: 
+				po.produire(SUPEG);
+				tCour = BOOL;
+				break;
+			case 21: 
+				po.produire(INF);
+				tCour = BOOL;
+				break;
+			case 22: 
+				po.produire(INFEG);
+				tCour = BOOL;
+				break;
+			//EXP2
+			case 23: 
+				if(tCour != BOOL) {
+					UtilLex.messErr("Mauvais type, type attendu : BOOL.");
+				}
+				break;
+			case 24: 
+				po.produire(NON);
+				tCour = BOOL;
+				break;
+			//EXP1
+			case 25: 
+				po.produire(ET);
+				tCour = BOOL;
+				break;
+			//EXPRESSION
+			case 26: 
+				po.produire(OU);
+				tCour = BOOL;
 				break;
             case 255 :
             	afftabSymb(); // affichage de la table des symboles en fin de compilation
