@@ -34,7 +34,7 @@ import java.io.FileInputStream;
 catch (RecognitionException e) {reportError (e) ; throw e ; }}
 
 
-unite  :   unitprog  EOF
+unite  :   unitprog {PtGen.pt(255);} EOF
       |    unitmodule  EOF
   ;
   
@@ -64,14 +64,14 @@ specif  : ident  ( 'fixe' '(' type  ( ',' type  )* ')' )?
                  ( 'mod'  '(' type  ( ',' type  )* ')' )? 
   ;
   
-consts  : 'const' ( ident {PtGen2.pt(1);} '=' valeur  ptvg  )+ 
+consts  : 'const' ( ident {PtGen.pt(1);} '=' valeur {PtGen.pt(2);} ptvg  )+ 
   ;
   
-vars  : 'var' ( type ident {PtGen2.pt(3);} ( ','  ident {PtGen2.pt(3);} )* {PtGen2.pt(27);} ptvg  )+
+vars  : 'var' ( type ident {PtGen.pt(3);} ( ','  ident {PtGen.pt(3);} )* ptvg  )+ {PtGen.pt(27);} 
   ;
   
-type  : 'ent'  {PtGen2.pt(4);}
-  |     'bool' {PtGen2.pt(5);}
+type  : 'ent'  {PtGen.pt(4);}
+  |     'bool' {PtGen.pt(5);}
   ;
   
 decprocs: (decproc ptvg)+
@@ -125,14 +125,14 @@ inscond : 'cond'  expression  ':' instructions
 boucle  : 'ttq'  expression 'faire' instructions 'fait' 
   ;
   
-lecture: 'lire' '(' ident  ( ',' ident  )* ')' 
+lecture: 'lire' '(' ident {PtGen.pt(28);} ( ',' ident {PtGen.pt(28);} )* ')' 
   ;
   
-ecriture: 'ecrire' '(' expression  ( ',' expression  )* ')'
+ecriture: 'ecrire' '(' expression {PtGen.pt(29);} ( ',' expression {PtGen.pt(29);} )* ')'
    ;
   
 affouappel
-  : ident  (    ':=' expression 
+  : ident {PtGen.pt(30);} ( ':=' expression {PtGen.pt(31);}
             |   (effixes (effmods)?)?  
            )
   ;
@@ -143,48 +143,48 @@ effixes : '(' (expression  (',' expression  )*)? ')'
 effmods :'(' (ident  (',' ident  )*)? ')'
   ; 
   
-expression: (exp1) ('ou' {PtGen2.pt(23);} exp1 {PtGen2.pt(23);} {PtGen2.pt(26);} )*
+expression: (exp1) ('ou' {PtGen.pt(23);} exp1 {PtGen.pt(23);} {PtGen.pt(26);} )*
   ;
   
-exp1  : exp2 ('et' {PtGen2.pt(23);}  exp2 {PtGen2.pt(23);} {PtGen2.pt(25);})*
+exp1  : exp2 ('et' {PtGen.pt(23);}  exp2 {PtGen.pt(23);} {PtGen.pt(25);})*
   ;
   
-exp2  : 'non' exp2 {PtGen2.pt(23);} {PtGen2.pt(24);} 
+exp2  : 'non' exp2 {PtGen.pt(23);} {PtGen.pt(24);} 
   | exp3  
   ;
   
 exp3  : exp4 
-  ( '='  {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(17);}
-  | '<>' {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(18);}
-  | '>'  {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(19);}
-  | '>=' {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(20);}
-  | '<'  {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(21);}
-  | '<=' {PtGen2.pt(12);} exp4 {PtGen2.pt(12);} {PtGen2.pt(22);}
+  ( '='  {PtGen.pt(12);} exp4 {PtGen.pt(12);} {PtGen.pt(17);}
+  | '<>' {PtGen.pt(12);} exp4 {PtGen.pt(12);} {PtGen.pt(18);}
+  | '>'  {PtGen.pt(12);} exp4 {PtGen.pt(12);} {PtGen.pt(19);}
+  | '>=' {PtGen.pt(12);} exp4 {PtGen.pt(12);} {PtGen.pt(20);}
+  | '<'  {PtGen.pt(12);} exp4 {PtGen.pt(12);} {PtGen.pt(21);}
+  | '<=' {PtGen.pt(12);} exp4 {PtGen.pt(12);} {PtGen.pt(22);}
   ) ?
   ;
   
 exp4  : exp5 
-        ('+' {PtGen2.pt(12);} exp5 {PtGen2.pt(12);} {PtGen2.pt(15);}
-        |'-' {PtGen2.pt(12);} exp5 {PtGen2.pt(12);} {PtGen2.pt(16);}
+        ('+' {PtGen.pt(12);} exp5 {PtGen.pt(12);} {PtGen.pt(15);}
+        |'-' {PtGen.pt(12);} exp5 {PtGen.pt(12);} {PtGen.pt(16);}
         )*
   ;
   
 exp5  : primaire  
-        (    '*' {PtGen2.pt(12);}   primaire  {PtGen2.pt(12);} {PtGen2.pt(13);}
-          | 'div' {PtGen2.pt(12);}  primaire  {PtGen2.pt(12);} {PtGen2.pt(14);}
+        (    '*' {PtGen.pt(12);}   primaire  {PtGen.pt(12);} {PtGen.pt(13);}
+          | 'div' {PtGen.pt(12);}  primaire  {PtGen.pt(12);} {PtGen.pt(14);}
         )*
   ;
   
-primaire: valeur {PtGen2.pt(11);}
-  | ident  {PtGen2.pt(10);}
+primaire: valeur {PtGen.pt(11);}
+  | ident  {PtGen.pt(10);}
   | '(' expression ')'
   ;
   
-valeur  : nbentier {PtGen2.pt(6);}
-  | '+' nbentier {PtGen2.pt(6);}
-  | '-' nbentier {PtGen2.pt(7);}
-  | 'vrai' {PtGen2.pt(8);}
-  | 'faux' {PtGen2.pt(9);}
+valeur  : nbentier {PtGen.pt(6);}
+  | '+' nbentier {PtGen.pt(6);}
+  | '-' nbentier {PtGen.pt(7);}
+  | 'vrai' {PtGen.pt(8);}
+  | 'faux' {PtGen.pt(9);}
   ;
 
 // partie lexicale  : cette partie ne doit pas etre modifiee  //

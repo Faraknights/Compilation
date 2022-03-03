@@ -131,8 +131,9 @@ public class PtGen {
     // it = indice de remplissage de tabSymb
     // bc = bloc courant (=1 si le bloc courant est le programme principal)
 	private static int it, bc;
-	
+
 	private static int iterateurDesVariables;
+	private static int idVarAffectation;
 	
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
@@ -224,7 +225,7 @@ public class PtGen {
 	
 	
 	public static void pt(int numGen) {
-	
+		int idIdent;
 		switch (numGen) {
 			case 0:
 				initialisations();
@@ -236,7 +237,7 @@ public class PtGen {
 				}
 				break; 
 			case 2: 
-				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, UtilLex.valEnt);
+				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, vCour);
 				break;
 			// VARIABLES
 			case 3: 
@@ -277,12 +278,16 @@ public class PtGen {
 				break;
 			// PRIMAIRE
 			case 10: 
-				int idIdent = presentIdent(bc);
+				idIdent = presentIdent(bc);
 				if(idIdent == 0) {
 					UtilLex.messErr("Identifiant inconnu");
 				}
 				tCour = tabSymb[idIdent].type;
-				po.produire(CONTENUG);
+				if(tabSymb[idIdent].categorie == CONSTANTE) {
+					po.produire(EMPILER);
+				} else if(tabSymb[idIdent].categorie == VARGLOBALE) {
+					po.produire(CONTENUG);
+				}
 				po.produire(tabSymb[idIdent].info);
 				break;
 			case 11: 
@@ -357,8 +362,54 @@ public class PtGen {
 				po.produire(OU);
 				tCour = BOOL;
 				break;
+			//LECTURE
+			case 28: 
+				idIdent = presentIdent(bc);
+				if(idIdent == 0) {
+					UtilLex.messErr("Identifiant inconnu");
+				}
+				if(tabSymb[idIdent].categorie == CONSTANTE) {
+					po.produire(EMPILER);
+				} else if(tabSymb[idIdent].categorie == VARGLOBALE) {
+					po.produire(CONTENUG);
+				}
+				po.produire(tabSymb[idIdent].info);
+				if(tabSymb[idIdent].type == BOOL) {
+					po.produire(LIREBOOL);
+				} else if(tabSymb[idIdent].categorie == ENT) {
+					po.produire(LIRENT);
+				}
+				break;
+			//ECRITURE
+			case 29: 
+				if(tCour == BOOL) {
+					po.produire(ECRBOOL);
+				} else if(tCour == ENT) {
+					po.produire(ECRENT);
+				}
+				break;
+			//AFFECTATION
+			case 30: 
+				idIdent = presentIdent(bc);
+				if(idIdent == 0) {
+					UtilLex.messErr("Identifiant inconnu");
+				}
+				if(tabSymb[idIdent].categorie == CONSTANTE) {
+					UtilLex.messErr("Impossible d'affecter une constante");
+				}
+				idVarAffectation = idIdent;
+				break;
+			case 31: 
+				if(tabSymb[idVarAffectation].type != tCour) {
+					UtilLex.messErr("type incompatible avec le type de la variable à affecter");
+				}
+				po.produire(AFFECTERG);
+				po.produire(tabSymb[idVarAffectation].info);
+				break;
             case 255 :
             	afftabSymb(); // affichage de la table des symboles en fin de compilation
+            	po.constObj();
+            	po.constGen();
             	break;
 
 		// TODO
