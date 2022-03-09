@@ -34,7 +34,7 @@ import java.io.FileInputStream;
 catch (RecognitionException e) {reportError (e) ; throw e ; }}
 
 
-unite  :   unitprog {PtGen.pt(255);} EOF
+unite  :   unitprog {PtGen.pt(32);} {PtGen.pt(255);} EOF 
       |    unitmodule  EOF
   ;
   
@@ -113,7 +113,7 @@ instruction
   |
   ;
   
-inssi : 'si' expression 'alors' instructions ('sinon'  instructions)? 'fsi' 
+inssi : 'si' expression 'alors' {PtGen.pt(33);} instructions ('sinon' {PtGen.pt(34);} instructions)? 'fsi' {PtGen.pt(35);}
   ;
   
 inscond : 'cond'  expression  ':' instructions 
@@ -122,7 +122,7 @@ inscond : 'cond'  expression  ':' instructions
           'fcond' 
   ;
   
-boucle  : 'ttq'  expression 'faire' instructions 'fait' 
+boucle  : 'ttq' {PtGen.pt(36);} expression 'faire' {PtGen.pt(37);} instructions 'fait' {PtGen.pt(38);}
   ;
   
 lecture: 'lire' '(' ident {PtGen.pt(28);} ( ',' ident {PtGen.pt(28);} )* ')' 

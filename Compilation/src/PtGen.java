@@ -369,16 +369,15 @@ public class PtGen {
 					UtilLex.messErr("Identifiant inconnu");
 				}
 				if(tabSymb[idIdent].categorie == CONSTANTE) {
-					po.produire(EMPILER);
-				} else if(tabSymb[idIdent].categorie == VARGLOBALE) {
-					po.produire(CONTENUG);
+					UtilLex.messErr("On ne peut pas modifier une constante");
 				}
-				po.produire(tabSymb[idIdent].info);
 				if(tabSymb[idIdent].type == BOOL) {
 					po.produire(LIREBOOL);
-				} else if(tabSymb[idIdent].categorie == ENT) {
+				} else if(tabSymb[idIdent].type == ENT) {
 					po.produire(LIRENT);
 				}
+				po.produire(AFFECTERG);
+				po.produire(tabSymb[idIdent].info);
 				break;
 			//ECRITURE
 			case 29: 
@@ -406,6 +405,43 @@ public class PtGen {
 				po.produire(AFFECTERG);
 				po.produire(tabSymb[idVarAffectation].info);
 				break;
+			//Fin de fichier
+			case 32: 
+				po.produire(ARRET);
+				break;
+			//inssi - then
+			case 33: 
+				po.produire(BSIFAUX);
+				po.produire(-1);
+				pileRep.empiler(po.getIpo());
+				break;
+			//inssi - sinon
+			case 34: 
+				po.produire(BINCOND);
+				po.produire(-1);
+				po.modifier(pileRep.depiler(), po.getIpo() + 1);
+				pileRep.empiler(po.getIpo());
+				break;
+			//inssi - fsi
+			case 35: 
+				po.modifier(pileRep.depiler(), po.getIpo() + 1);
+				break; 
+			//boucle - ttq
+			case 36: 
+				pileRep.empiler(po.getIpo() + 1);
+				break; 
+			//inssi - faire
+			case 37: 
+				po.produire(BSIFAUX);
+				po.produire(-1);
+				pileRep.empiler(po.getIpo());
+				break; 
+			//inssi - fait
+			case 38: 
+				po.modifier(pileRep.depiler(), po.getIpo() + 3);
+				po.produire(BINCOND);
+				po.produire(pileRep.depiler());
+				break; 
             case 255 :
             	afftabSymb(); // affichage de la table des symboles en fin de compilation
             	po.constObj();

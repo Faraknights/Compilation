@@ -1,0 +1,22 @@
+FICHIER test/si.gen : 
+
+   1  reserver        1
+   3  empiler         5
+   5  empiler         4
+   7  eg        
+   8  bsifaux        16
+  10  empiler         1
+  12  affecterg       0
+  14  bincond        33
+  16  empiler         5
+  18  empiler         3
+  20  eg        
+  21  bsifaux        29
+  23  empiler         2
+  25  affecterg       0
+  27  bincond        33
+  29  empiler         3
+  31  affecterg       0
+  33  contenug        0
+  35  ecrent    
+  36  arret     
