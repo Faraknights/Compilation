@@ -226,6 +226,8 @@ public class PtGen {
 	
 	public static void pt(int numGen) {
 		int idIdent;
+		int ipotmp;
+		int ipoprec;
 		switch (numGen) {
 			case 0:
 				initialisations();
@@ -368,7 +370,7 @@ public class PtGen {
 				if(idIdent == 0) {
 					UtilLex.messErr("Identifiant inconnu");
 				}
-				if(tabSymb[idIdent].categorie == CONSTANTE) {
+				if(tabSymb[idIdent].categorie == CONSTANTE){
 					UtilLex.messErr("On ne peut pas modifier une constante");
 				}
 				if(tabSymb[idIdent].type == BOOL) {
@@ -441,6 +443,32 @@ public class PtGen {
 				po.modifier(pileRep.depiler(), po.getIpo() + 3);
 				po.produire(BINCOND);
 				po.produire(pileRep.depiler());
+				break; 
+			//condition - cond
+			case 39: 
+				pileRep.empiler(-2);
+				break; 
+			//condition - finExpr
+			case 40: 
+				po.produire(BSIFAUX);
+				po.produire(-1);
+				pileRep.empiler(po.getIpo());
+				break;
+			//condition - finExpr
+			case 41: 
+				po.modifier(pileRep.depiler(), po.getIpo() + 3);
+				po.produire(BINCOND);
+				po.produire(pileRep.depiler());
+				pileRep.empiler(po.getIpo());
+				break; 
+			//condition - fincond
+			case 42: 
+				ipotmp = pileRep.depiler();
+				while (ipotmp != -2) {
+					ipoprec = po.getElt(ipotmp);
+					po.modifier(ipotmp, po.getIpo() + 1);
+					ipotmp = ipoprec;
+				}
 				break; 
             case 255 :
             	afftabSymb(); // affichage de la table des symboles en fin de compilation
