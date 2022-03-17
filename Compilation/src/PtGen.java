@@ -133,6 +133,7 @@ public class PtGen {
 	private static int it, bc;
 
 	private static int iterateurDesVariables;
+	private static int compteurParam;
 	private static int idVarAffectation;
 	
 	/** 
@@ -199,8 +200,9 @@ public class PtGen {
 		// indices de gestion de la table des symboles
 		it = 0;
 		bc = 1;
-		
+
 		iterateurDesVariables = 0;
+		compteurParam = 0;
 		
 		// pile des reprises pour compilation des branchements en avant
 		pileRep = new TPileRep(); 
@@ -246,7 +248,11 @@ public class PtGen {
 				if(presentIdent(bc) != 0) {
 					UtilLex.messErr("Identifiant deja utilise");
 				} else {
-					placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, iterateurDesVariables);
+					if(bc == 1) {
+						placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, iterateurDesVariables);
+					} else {
+						placeIdent(UtilLex.numIdCourant, VARLOCALE, tCour, iterateurDesVariables + 2);
+					}
 				}
 				iterateurDesVariables++;
 				break;
@@ -282,7 +288,7 @@ public class PtGen {
 			case 10: 
 				idIdent = presentIdent(bc);
 				if(idIdent == 0) {
-					UtilLex.messErr("Identifiant inconnu");
+					UtilLex.messErr("Identifiant inconnu : " + UtilLex.numIdCourant);
 				}
 				tCour = tabSymb[idIdent].type;
 				if(tabSymb[idIdent].categorie == CONSTANTE) {
@@ -368,7 +374,7 @@ public class PtGen {
 			case 28: 
 				idIdent = presentIdent(bc);
 				if(idIdent == 0) {
-					UtilLex.messErr("Identifiant inconnu");
+					UtilLex.messErr("Identifiant inconnu : " + UtilLex.numIdCourant);
 				}
 				if(tabSymb[idIdent].categorie == CONSTANTE){
 					UtilLex.messErr("On ne peut pas modifier une constante");
@@ -393,7 +399,7 @@ public class PtGen {
 			case 30: 
 				idIdent = presentIdent(bc);
 				if(idIdent == 0) {
-					UtilLex.messErr("Identifiant inconnu");
+					UtilLex.messErr("Identifiant inconnu : " + UtilLex.numIdCourant);
 				}
 				if(tabSymb[idIdent].categorie == CONSTANTE) {
 					UtilLex.messErr("Impossible d'affecter une constante");
@@ -469,6 +475,27 @@ public class PtGen {
 					po.modifier(ipotmp, po.getIpo() + 1);
 					ipotmp = ipoprec;
 				}
+				break; 
+			//procédure
+			case 43: 
+				if(presentIdent(bc) != 0) {
+					UtilLex.messErr("Identifiant deja utilise");
+				}
+				placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo());
+				placeIdent(-1, PRIVEE, NEUTRE, -1);
+				bc = it;
+				iterateurDesVariables = 0;
+				break; 
+			case 44:
+				placeIdent(UtilLex.numIdCourant, PARAMFIXE, tCour, iterateurDesVariables);
+				compteurParam++;
+				break; 
+			case 45:
+				placeIdent(UtilLex.numIdCourant, PARAMMOD, tCour, iterateurDesVariables);
+				compteurParam++;
+				break; 
+			case 46:
+				placeIdent(bc - 1, PRIVEE, NEUTRE, compteurParam);
 				break; 
             case 255 :
             	afftabSymb(); // affichage de la table des symboles en fin de compilation

@@ -77,7 +77,7 @@ type  : 'ent'  {PtGen.pt(4);}
 decprocs: (decproc ptvg)+
   ;
   
-decproc :  'proc'  ident  parfixe? parmod? consts? vars? corps 
+decproc :  'proc'  ident {PtGen.pt(43);} parfixe? parmod? {PtGen.pt(46);} consts? vars? corps 
   ;
   
 ptvg  : ';'
@@ -90,13 +90,13 @@ corps : 'debut' instructions 'fin'
 parfixe: 'fixe' '(' pf ( ';' pf)* ')'
   ;
   
-pf  : type ident  ( ',' ident  )*  
+pf  : type ident {PtGen.pt(44);} ( ',' ident {PtGen.pt(44);} )*  
   ;
 
 parmod  : 'mod' '(' pm ( ';' pm)* ')'
   ;
   
-pm  : type ident  ( ',' ident  )*
+pm  : type ident  {PtGen.pt(45);} ( ',' ident  {PtGen.pt(45);} )*
   ;
   
 instructions
@@ -116,9 +116,9 @@ instruction
 inssi : 'si' expression 'alors' {PtGen.pt(33);} instructions ('sinon' {PtGen.pt(34);} instructions)? 'fsi' {PtGen.pt(35);}
   ;
   
-inscond : 'cond' {PtGen.pt(39);} expression ':' {PtGen.pt(40);} instructions {PtGen.pt(41);}
-          (','  expression  ':' {PtGen.pt(40);}  instructions {PtGen.pt(41);} )* 
-          ('aut' instructions |  ) 
+inscond : 'cond' {PtGen.pt(39);} expression ':' {PtGen.pt(40);} instructions
+          (',' {PtGen.pt(41);} expression  ':' {PtGen.pt(40);}  instructions )* 
+          ('aut' {PtGen.pt(41);} instructions |  ) 
           'fcond' {PtGen.pt(42);}
   ;
   
