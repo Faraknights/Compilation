@@ -232,7 +232,7 @@ public class PtGen {
 			case 0:
 				initialisations();
 				break;
-			// CONSTANTES
+			// Constantes
 			case 1: 
 				if(presentIdent(bc) != 0) {
 					UtilLex.messErr("Identifiant deja utilise");
