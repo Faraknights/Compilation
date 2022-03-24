@@ -497,6 +497,11 @@ public class PtGen {
 				po.produire(pileRep.depiler());
 				pileRep.empiler(po.getIpo());
 				break; 
+			//condition - finExpr
+			case 55: 
+				po.modifier(pileRep.depiler(), po.getIpo() + 1);
+				break; 
+				
 			//condition - fincond
 			case 42: 
 				ipotmp = pileRep.depiler();
@@ -536,7 +541,7 @@ public class PtGen {
 				iterateurDesProc+=2;
 				break;
 			case 47: 
-				po.produire(EMPILER);
+				po.produire(RESERVER);
 				po.produire(iterateurDesVariables);
 				break; 
 			//fin
