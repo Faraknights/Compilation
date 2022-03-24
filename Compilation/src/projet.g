@@ -34,7 +34,7 @@ import java.io.FileInputStream;
 catch (RecognitionException e) {reportError (e) ; throw e ; }}
 
 
-unite  :   unitprog {PtGen.pt(32);} {PtGen.pt(255);} EOF 
+unite  :   unitprog {PtGen.pt(255);} EOF 
       |    unitmodule  EOF
   ;
   
@@ -50,7 +50,7 @@ unitmodule
   ;
   
 declarations
-  : partiedef? partieref? consts? vars? decprocs? 
+  : partiedef? partieref? consts? vars? {PtGen.pt(27);} decprocs? 
   ;
   
 partiedef
@@ -67,7 +67,7 @@ specif  : ident  ( 'fixe' '(' type  ( ',' type  )* ')' )?
 consts  : 'const' ( ident {PtGen.pt(1);} '=' valeur {PtGen.pt(2);} ptvg  )+ 
   ;
   
-vars  : 'var' ( type ident {PtGen.pt(3);} ( ','  ident {PtGen.pt(3);} )* ptvg  )+ {PtGen.pt(27);} 
+vars  : 'var' ( type ident {PtGen.pt(3);} ( ','  ident {PtGen.pt(3);} )* ptvg  )+ 
   ;
   
 type  : 'ent'  {PtGen.pt(4);}
@@ -85,7 +85,7 @@ ptvg  : ';'
   | 
   ;
   
-corps : 'debut' instructions 'fin' {PtGen.pt(48);}
+corps : 'debut' {PtGen.pt(53);} instructions 'fin' {PtGen.pt(48);}
   ;
   
 parfixe: 'fixe' '(' pf ( ';' pf)* ')'
@@ -117,8 +117,8 @@ instruction
 inssi : 'si' expression 'alors' {PtGen.pt(33);} instructions ('sinon' {PtGen.pt(34);} instructions)? 'fsi' {PtGen.pt(35);}
   ;
   
-inscond : 'cond' {PtGen.pt(39);} expression ':' {PtGen.pt(40);} instructions }
-          (',' {PtGen.pt(41); expression  ':' {PtGen.pt(40);}  instructions )* 
+inscond : 'cond' {PtGen.pt(39);} expression ':' {PtGen.pt(40);} instructions
+          (',' {PtGen.pt(41);} expression  ':' {PtGen.pt(40);}  instructions )* 
           ('aut' {PtGen.pt(41);} instructions |  ) 
           'fcond' {PtGen.pt(42);}
   ;

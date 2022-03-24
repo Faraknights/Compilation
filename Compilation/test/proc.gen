@@ -1,0 +1,30 @@
+FICHIER test/proc.gen : 
+
+   1  reserver        2
+   3  bincond        46
+   5  empiler         1
+   7  contenul        0   0
+  10  empiler         1
+  12  eg        
+  13  bsifaux        22
+  15  empiler         1
+  17  affecterl       1   1
+  20  bincond        44
+  22  contenul        0   0
+  25  empiler         1
+  27  sous      
+  28  empileradl      4   0
+  31  appel           5   2
+  34  contenul        0   0
+  37  contenul        4   0
+  40  mul       
+  41  affecterl       1   1
+  44  retour          2
+  46  lirent    
+  47  affecterg       0
+  49  contenug        0
+  51  empileradg      1
+  53  appel           5   2
+  56  contenug        1
+  58  ecrent    
+  59  arret     

@@ -263,6 +263,9 @@ public class PtGen {
 			case 27: 
 				po.produire(RESERVER);
 				po.produire(iterateurDesVariables);
+				po.produire(BINCOND);
+				po.produire(-1);
+				pileRep.empiler(po.getIpo());
 				break;
 			// TYPES
 			case 4: 
@@ -301,11 +304,11 @@ public class PtGen {
 				} else if(tabSymb[idIdent].categorie == VARGLOBALE) {
 					po.produire(CONTENUG);
 					po.produire(tabSymb[idIdent].info);
-				}  else if(tabSymb[idIdent].categorie == VARLOCALE) {
+				}  else if(tabSymb[idIdent].categorie == PARAMFIXE || tabSymb[idIdent].categorie == VARLOCALE) {
 					po.produire(CONTENUL);
 					po.produire(tabSymb[idIdent].info);
 					po.produire(0);
-				}  else if(tabSymb[idIdent].categorie == PARAMFIXE || tabSymb[idIdent].categorie == PARAMMOD) {
+				}  else if(tabSymb[idIdent].categorie == PARAMMOD) {
 					po.produire(CONTENUL);
 					po.produire(tabSymb[idIdent].info);
 					po.produire(1);
@@ -446,10 +449,6 @@ public class PtGen {
 					po.produire(1);
 				}
 				break;
-			//Fin de fichier
-			case 32: 
-				po.produire(ARRET);
-				break;
 			//inssi - then
 			case 33: 
 				po.produire(BSIFAUX);
@@ -509,12 +508,12 @@ public class PtGen {
 					ipotmp = ipoprec;
 				}
 				break; 
-			//proc�dure
+			//procedure
 			case 43: 
 				if(presentIdent(bc) != 0) {
 					UtilLex.messErr("Identifiant deja utilise");
 				}
-				placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo());
+				placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo() + 1);
 				placeIdent(-1, PRIVEE, NEUTRE, -1);
 				bc = it + 1;
 				iterateurDesProc = 0;
@@ -524,15 +523,17 @@ public class PtGen {
 					UtilLex.messErr("Identifiant deja utilise");
 				}
 				placeIdent(UtilLex.numIdCourant, PARAMFIXE, tCour, iterateurDesProc);
+				iterateurDesProc++;
 				break; 
 			case 45: 
 				if(presentIdent(bc) != 0) {
 					UtilLex.messErr("Identifiant deja utilise");
 				}
 				placeIdent(UtilLex.numIdCourant, PARAMMOD, tCour, iterateurDesProc);
+				iterateurDesProc++;
 				break; 
 			case 46: 
-				tabSymb[bc - 1].info = iterateurDesProc + 1;
+				tabSymb[bc - 1].info = iterateurDesProc;
 				iterateurDesVariables=0;
 				iterateurDesProc+=2;
 				break;
@@ -540,53 +541,87 @@ public class PtGen {
 				po.produire(EMPILER);
 				po.produire(iterateurDesVariables);
 				break; 
+			//fin
 			case 48: 
-				int nbValSup = 0;
-				for (int i = bc; i <= it ; i++) {
-					if(tabSymb[i].categorie == PARAMFIXE || tabSymb[i].categorie == PARAMMOD) {
-						tabSymb[i].code = -1;
-					} else if(tabSymb[i].categorie == VARLOCALE || tabSymb[i].categorie == CONSTANTE) {
-						nbValSup++;
-						tabSymb[i] = null;
+				if(bc != 1) {
+					po.produire(RETOUR);
+					po.produire(tabSymb[bc - 1].info);
+					int nbValSup = 0;
+					for (int i = bc; i <= it ; i++) {
+						if(tabSymb[i].categorie == PARAMFIXE || tabSymb[i].categorie == PARAMMOD) {
+							tabSymb[i].code = -1;
+						} else if(tabSymb[i].categorie == VARLOCALE || tabSymb[i].categorie == CONSTANTE) {
+							nbValSup++;
+							tabSymb[i] = null;
+						}
 					}
+					it -= nbValSup ;
+					bc = 1;
+				} else {
+					po.produire(ARRET);
 				}
-				it -= nbValSup ;
-				bc = 1;
 				break; 
 			case 49: 
 				nbParamAppel = 0; 
 				break; 
-			case 50: 
-				if(idVarAffectation + 2 + nbParamAppel > tabSymb[idVarAffectation + 1].info) {
-					UtilLex.messErr("Trop de param�tres d�clar�s");
+			case 50:
+				//appel paramfixe
+				if(nbParamAppel >= tabSymb[idVarAffectation + 1].info) {
+					UtilLex.messErr("Trop de parametres declares");
 				}
 				if(tabSymb[idVarAffectation + 2 + nbParamAppel].type != tCour) {
 					UtilLex.messErr("Mauvais type de variable sur le " + nbParamAppel + "e parametre");
 				}
 				if(tabSymb[idVarAffectation + 2 + nbParamAppel].categorie == PARAMMOD) {
-					UtilLex.messErr("Trop de constantes d�clar�s");
+					UtilLex.messErr("Trop de constantes declares");
 				}
 				nbParamAppel++;
 				break; 
 			case 51: 
-				if(idVarAffectation + 2 + nbParamAppel > tabSymb[idVarAffectation + 1].info) {
-					UtilLex.messErr("Trop de param�tres d�clar�s");
+				//appel parammod
+				if(nbParamAppel >= tabSymb[idVarAffectation + 1].info) {
+					UtilLex.messErr("Trop de parametres declares :" + nbParamAppel + " " + tabSymb[idVarAffectation + 1].info);
 				}
-				if(tabSymb[idVarAffectation + 2 + nbParamAppel].type != tCour) {
+				idIdent = presentIdent(1);
+				if(idIdent == 0) {
+					UtilLex.messErr("Identifiant inconnu");
+				}
+				if(tabSymb[idVarAffectation + 2 + nbParamAppel].type != tabSymb[idIdent].type) {
 					UtilLex.messErr("Mauvais type de variable sur le " + nbParamAppel + "e parametre");
 				}
 				if(tabSymb[idVarAffectation + 2 + nbParamAppel].categorie == PARAMFIXE) {
-					UtilLex.messErr("Constante(s) non d�clar�s");
+					UtilLex.messErr("Constante(s) non declares");
+				}
+				if(tabSymb[idIdent].categorie == CONSTANTE) {
+					UtilLex.messErr("Vous ne pouvez pas déclarer de constante en parametre modifiable de fonction");
 				}
 				nbParamAppel++;
 				
-				//mettre les affetradg
+				if(tabSymb[idIdent].categorie == PARAMMOD) {
+					po.produire(EMPILERADL);
+					po.produire(tabSymb[idIdent].info);
+					po.produire(1);
+				} else if(tabSymb[idIdent].categorie == VARLOCALE || tabSymb[idIdent].categorie == PARAMFIXE) {
+					po.produire(EMPILERADL);
+					po.produire(tabSymb[idIdent].info);
+					po.produire(0);
+				} else if(tabSymb[idIdent].categorie == VARGLOBALE) {
+					po.produire(EMPILERADG);
+					po.produire(tabSymb[idIdent].info);
+				}
 				break; 
 			case 52: 
 				if(nbParamAppel != tabSymb[idVarAffectation + 1].info) {
-					UtilLex.messErr("Mauvais nombre de param�tre d�clar�");
+					UtilLex.messErr("Mauvais nombre de parametre declare : " + nbParamAppel + " " + tabSymb[idVarAffectation + 1].info);
 				}
-				//appel
+				po.produire(APPEL);
+				po.produire(tabSymb[idVarAffectation].info);
+				po.produire(tabSymb[idVarAffectation + 1].info);
+				break; 
+			case 53: 
+				if(bc == 1) {
+					po.modifier(pileRep.depiler(), po.getIpo() + 1);
+				}
 				break; 
             case 255 :
             	afftabSymb(); // affichage de la table des symboles en fin de compilation
