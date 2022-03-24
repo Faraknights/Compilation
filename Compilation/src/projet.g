@@ -77,14 +77,15 @@ type  : 'ent'  {PtGen.pt(4);}
 decprocs: (decproc ptvg)+
   ;
   
-decproc :  'proc'  ident {PtGen.pt(43);} parfixe? parmod? {PtGen.pt(46);} consts? vars? corps 
+
+decproc :  'proc'  ident {PtGen.pt(43);} parfixe? parmod? {PtGen.pt(46);} consts? vars?  {PtGen.pt(47);} corps 
   ;
   
 ptvg  : ';'
   | 
   ;
   
-corps : 'debut' instructions 'fin'
+corps : 'debut' instructions 'fin' {PtGen.pt(48);}
   ;
   
 parfixe: 'fixe' '(' pf ( ';' pf)* ')'
@@ -93,10 +94,10 @@ parfixe: 'fixe' '(' pf ( ';' pf)* ')'
 pf  : type ident {PtGen.pt(44);} ( ',' ident {PtGen.pt(44);} )*  
   ;
 
-parmod  : 'mod' '(' pm ( ';' pm)* ')'
+parmod : 'mod' '(' pm ( ';' pm)* ')'
   ;
   
-pm  : type ident  {PtGen.pt(45);} ( ',' ident  {PtGen.pt(45);} )*
+pm  : type ident {PtGen.pt(45);} ( ',' ident {PtGen.pt(45);} )*
   ;
   
 instructions
@@ -116,8 +117,8 @@ instruction
 inssi : 'si' expression 'alors' {PtGen.pt(33);} instructions ('sinon' {PtGen.pt(34);} instructions)? 'fsi' {PtGen.pt(35);}
   ;
   
-inscond : 'cond' {PtGen.pt(39);} expression ':' {PtGen.pt(40);} instructions
-          (',' {PtGen.pt(41);} expression  ':' {PtGen.pt(40);}  instructions )* 
+inscond : 'cond' {PtGen.pt(39);} expression ':' {PtGen.pt(40);} instructions }
+          (',' {PtGen.pt(41); expression  ':' {PtGen.pt(40);}  instructions )* 
           ('aut' {PtGen.pt(41);} instructions |  ) 
           'fcond' {PtGen.pt(42);}
   ;
@@ -132,15 +133,15 @@ ecriture: 'ecrire' '(' expression {PtGen.pt(29);} ( ',' expression {PtGen.pt(29)
    ;
   
 affouappel
-  : ident {PtGen.pt(30);} ( ':=' expression {PtGen.pt(31);}
-            |   (effixes (effmods)?)?  
+  : ident {PtGen.pt(30);} ( ':=' expression  {PtGen.pt(31);}
+            | (effixes (effmods)?)? {PtGen.pt(52);}
            )
   ;
    
-effixes : '(' (expression  (',' expression  )*)? ')'
+effixes : '(' {PtGen.pt(49);} (expression {PtGen.pt(50);} (',' expression {PtGen.pt(50);} )*)? ')'
   ;
   
-effmods :'(' (ident  (',' ident  )*)? ')'
+effmods :'(' (ident {PtGen.pt(51);} (',' ident {PtGen.pt(51);} )*)? ')'
   ; 
   
 expression: (exp1) ('ou' {PtGen.pt(23);} exp1 {PtGen.pt(23);} {PtGen.pt(26);} )*

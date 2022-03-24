@@ -1,3 +1,4 @@
+
 /*********************************************************************************
  * VARIABLES ET METHODES FOURNIES PAR LA CLASSE UtilLex (cf libClass_Projet)     *
  *       complement à l'ANALYSEUR LEXICAL produit par ANTLR                      *
@@ -133,8 +134,9 @@ public class PtGen {
 	private static int it, bc;
 
 	private static int iterateurDesVariables;
-	private static int compteurParam;
+	private static int iterateurDesProc;
 	private static int idVarAffectation;
+	private static int nbParamAppel;
 	
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
@@ -200,9 +202,10 @@ public class PtGen {
 		// indices de gestion de la table des symboles
 		it = 0;
 		bc = 1;
-
+		
 		iterateurDesVariables = 0;
-		compteurParam = 0;
+		iterateurDesProc = 0;
+		nbParamAppel = 0;
 		
 		// pile des reprises pour compilation des branchements en avant
 		pileRep = new TPileRep(); 
@@ -236,7 +239,7 @@ public class PtGen {
 				break;
 			// Constantes
 			case 1: 
-				if(presentIdent(bc) != 0) {
+				if(presentIdent(1) != 0) {
 					UtilLex.messErr("Identifiant deja utilise");
 				}
 				break; 
@@ -245,13 +248,14 @@ public class PtGen {
 				break;
 			// VARIABLES
 			case 3: 
-				if(presentIdent(bc) != 0) {
+				if(presentIdent(1) != 0) {
 					UtilLex.messErr("Identifiant deja utilise");
 				} else {
-					if(bc == 1) {
-						placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, iterateurDesVariables);
+					if(bc != 1) {
+						placeIdent(UtilLex.numIdCourant, VARLOCALE, tCour, iterateurDesProc);
+						iterateurDesProc++;
 					} else {
-						placeIdent(UtilLex.numIdCourant, VARLOCALE, tCour, iterateurDesVariables + 2);
+						placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, iterateurDesVariables);
 					}
 				}
 				iterateurDesVariables++;
@@ -286,17 +290,26 @@ public class PtGen {
 				break;
 			// PRIMAIRE
 			case 10: 
-				idIdent = presentIdent(bc);
+				idIdent = presentIdent(1);
 				if(idIdent == 0) {
-					UtilLex.messErr("Identifiant inconnu : " + UtilLex.numIdCourant);
+					UtilLex.messErr("Identifiant inconnu");
 				}
 				tCour = tabSymb[idIdent].type;
 				if(tabSymb[idIdent].categorie == CONSTANTE) {
 					po.produire(EMPILER);
+					po.produire(tabSymb[idIdent].info);
 				} else if(tabSymb[idIdent].categorie == VARGLOBALE) {
 					po.produire(CONTENUG);
-				}
-				po.produire(tabSymb[idIdent].info);
+					po.produire(tabSymb[idIdent].info);
+				}  else if(tabSymb[idIdent].categorie == VARLOCALE) {
+					po.produire(CONTENUL);
+					po.produire(tabSymb[idIdent].info);
+					po.produire(0);
+				}  else if(tabSymb[idIdent].categorie == PARAMFIXE || tabSymb[idIdent].categorie == PARAMMOD) {
+					po.produire(CONTENUL);
+					po.produire(tabSymb[idIdent].info);
+					po.produire(1);
+				} 
 				break;
 			case 11: 
 				po.produire(EMPILER);
@@ -372,11 +385,11 @@ public class PtGen {
 				break;
 			//LECTURE
 			case 28: 
-				idIdent = presentIdent(bc);
+				idIdent = presentIdent(1);
 				if(idIdent == 0) {
-					UtilLex.messErr("Identifiant inconnu : " + UtilLex.numIdCourant);
+					UtilLex.messErr("Identifiant inconnu");
 				}
-				if(tabSymb[idIdent].categorie == CONSTANTE){
+				if(tabSymb[idIdent].categorie == CONSTANTE || tabSymb[idIdent].categorie == PARAMFIXE){
 					UtilLex.messErr("On ne peut pas modifier une constante");
 				}
 				if(tabSymb[idIdent].type == BOOL) {
@@ -384,8 +397,18 @@ public class PtGen {
 				} else if(tabSymb[idIdent].type == ENT) {
 					po.produire(LIRENT);
 				}
-				po.produire(AFFECTERG);
-				po.produire(tabSymb[idIdent].info);
+				if(tabSymb[idIdent].categorie == VARGLOBALE) {
+					po.produire(AFFECTERG);
+					po.produire(tabSymb[idIdent].info);
+				} else if (tabSymb[idIdent].categorie == VARLOCALE) {
+					po.produire(AFFECTERL);
+					po.produire(tabSymb[idIdent].info);
+					po.produire(0);
+				} else if (tabSymb[idIdent].categorie == PARAMMOD) {
+					po.produire(AFFECTERL);
+					po.produire(tabSymb[idIdent].info);
+					po.produire(1);
+				}
 				break;
 			//ECRITURE
 			case 29: 
@@ -397,11 +420,11 @@ public class PtGen {
 				break;
 			//AFFECTATION
 			case 30: 
-				idIdent = presentIdent(bc);
+				idIdent = presentIdent(1);
 				if(idIdent == 0) {
-					UtilLex.messErr("Identifiant inconnu : " + UtilLex.numIdCourant);
+					UtilLex.messErr("Identifiant inconnu");
 				}
-				if(tabSymb[idIdent].categorie == CONSTANTE) {
+				if(tabSymb[idIdent].categorie == CONSTANTE || tabSymb[idIdent].categorie == PARAMFIXE) {
 					UtilLex.messErr("Impossible d'affecter une constante");
 				}
 				idVarAffectation = idIdent;
@@ -410,8 +433,18 @@ public class PtGen {
 				if(tabSymb[idVarAffectation].type != tCour) {
 					UtilLex.messErr("type incompatible avec le type de la variable à affecter");
 				}
-				po.produire(AFFECTERG);
-				po.produire(tabSymb[idVarAffectation].info);
+				if(tabSymb[idVarAffectation].categorie == VARGLOBALE) {
+					po.produire(AFFECTERG);
+					po.produire(tabSymb[idVarAffectation].info);
+				} else if (tabSymb[idVarAffectation].categorie == VARLOCALE) {
+					po.produire(AFFECTERL);
+					po.produire(tabSymb[idVarAffectation].info);
+					po.produire(0);
+				} else if (tabSymb[idVarAffectation].categorie == PARAMMOD) {
+					po.produire(AFFECTERL);
+					po.produire(tabSymb[idVarAffectation].info);
+					po.produire(1);
+				}
 				break;
 			//Fin de fichier
 			case 32: 
@@ -476,26 +509,84 @@ public class PtGen {
 					ipotmp = ipoprec;
 				}
 				break; 
-			//procédure
+			//proc�dure
 			case 43: 
 				if(presentIdent(bc) != 0) {
 					UtilLex.messErr("Identifiant deja utilise");
 				}
 				placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo());
 				placeIdent(-1, PRIVEE, NEUTRE, -1);
-				bc = it;
-				iterateurDesVariables = 0;
+				bc = it + 1;
+				iterateurDesProc = 0;
 				break; 
-			case 44:
-				placeIdent(UtilLex.numIdCourant, PARAMFIXE, tCour, iterateurDesVariables);
-				compteurParam++;
+			case 44: 
+				if(presentIdent(bc) != 0) {
+					UtilLex.messErr("Identifiant deja utilise");
+				}
+				placeIdent(UtilLex.numIdCourant, PARAMFIXE, tCour, iterateurDesProc);
 				break; 
-			case 45:
-				placeIdent(UtilLex.numIdCourant, PARAMMOD, tCour, iterateurDesVariables);
-				compteurParam++;
+			case 45: 
+				if(presentIdent(bc) != 0) {
+					UtilLex.messErr("Identifiant deja utilise");
+				}
+				placeIdent(UtilLex.numIdCourant, PARAMMOD, tCour, iterateurDesProc);
 				break; 
-			case 46:
-				placeIdent(bc - 1, PRIVEE, NEUTRE, compteurParam);
+			case 46: 
+				tabSymb[bc - 1].info = iterateurDesProc + 1;
+				iterateurDesVariables=0;
+				iterateurDesProc+=2;
+				break;
+			case 47: 
+				po.produire(EMPILER);
+				po.produire(iterateurDesVariables);
+				break; 
+			case 48: 
+				int nbValSup = 0;
+				for (int i = bc; i <= it ; i++) {
+					if(tabSymb[i].categorie == PARAMFIXE || tabSymb[i].categorie == PARAMMOD) {
+						tabSymb[i].code = -1;
+					} else if(tabSymb[i].categorie == VARLOCALE || tabSymb[i].categorie == CONSTANTE) {
+						nbValSup++;
+						tabSymb[i] = null;
+					}
+				}
+				it -= nbValSup ;
+				bc = 1;
+				break; 
+			case 49: 
+				nbParamAppel = 0; 
+				break; 
+			case 50: 
+				if(idVarAffectation + 2 + nbParamAppel > tabSymb[idVarAffectation + 1].info) {
+					UtilLex.messErr("Trop de param�tres d�clar�s");
+				}
+				if(tabSymb[idVarAffectation + 2 + nbParamAppel].type != tCour) {
+					UtilLex.messErr("Mauvais type de variable sur le " + nbParamAppel + "e parametre");
+				}
+				if(tabSymb[idVarAffectation + 2 + nbParamAppel].categorie == PARAMMOD) {
+					UtilLex.messErr("Trop de constantes d�clar�s");
+				}
+				nbParamAppel++;
+				break; 
+			case 51: 
+				if(idVarAffectation + 2 + nbParamAppel > tabSymb[idVarAffectation + 1].info) {
+					UtilLex.messErr("Trop de param�tres d�clar�s");
+				}
+				if(tabSymb[idVarAffectation + 2 + nbParamAppel].type != tCour) {
+					UtilLex.messErr("Mauvais type de variable sur le " + nbParamAppel + "e parametre");
+				}
+				if(tabSymb[idVarAffectation + 2 + nbParamAppel].categorie == PARAMFIXE) {
+					UtilLex.messErr("Constante(s) non d�clar�s");
+				}
+				nbParamAppel++;
+				
+				//mettre les affetradg
+				break; 
+			case 52: 
+				if(nbParamAppel != tabSymb[idVarAffectation + 1].info) {
+					UtilLex.messErr("Mauvais nombre de param�tre d�clar�");
+				}
+				//appel
 				break; 
             case 255 :
             	afftabSymb(); // affichage de la table des symboles en fin de compilation
@@ -512,17 +603,3 @@ public class PtGen {
 		}
 	}
 }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
- 
