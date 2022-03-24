@@ -22,6 +22,7 @@
 
 
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * classe de mise en oeuvre du compilateur
@@ -499,11 +500,7 @@ public class PtGen {
 			//condition - fincond
 			case 42: 
 				ipotmp = pileRep.depiler();
-				System.out.println(ipotmp);
 				while (ipotmp != -2) {
-					if(ipotmp < 1) {
-						UtilLex.messErr("appel d'ipo non autorisé : " + ipotmp);
-					}
 					ipoprec = po.getElt(ipotmp);
 					po.modifier(ipotmp, po.getIpo() + 1);
 					ipotmp = ipoprec;
