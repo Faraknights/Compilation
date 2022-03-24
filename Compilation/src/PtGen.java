@@ -263,9 +263,6 @@ public class PtGen {
 			case 27: 
 				po.produire(RESERVER);
 				po.produire(iterateurDesVariables);
-				po.produire(BINCOND);
-				po.produire(-1);
-				pileRep.empiler(po.getIpo());
 				break;
 			// TYPES
 			case 4: 
@@ -502,7 +499,11 @@ public class PtGen {
 			//condition - fincond
 			case 42: 
 				ipotmp = pileRep.depiler();
+				System.out.println(ipotmp);
 				while (ipotmp != -2) {
+					if(ipotmp < 1) {
+						UtilLex.messErr("appel d'ipo non autorisé : " + ipotmp);
+					}
 					ipoprec = po.getElt(ipotmp);
 					po.modifier(ipotmp, po.getIpo() + 1);
 					ipotmp = ipoprec;
@@ -560,6 +561,7 @@ public class PtGen {
 				} else {
 					po.produire(ARRET);
 				}
+            	afftabSymb(); // affichage de la table des symboles en fin de compilation
 				break; 
 			case 49: 
 				nbParamAppel = 0; 
@@ -619,12 +621,17 @@ public class PtGen {
 				po.produire(tabSymb[idVarAffectation + 1].info);
 				break; 
 			case 53: 
+            	afftabSymb(); // affichage de la table des symboles en fin de compilation
 				if(bc == 1) {
 					po.modifier(pileRep.depiler(), po.getIpo() + 1);
 				}
 				break; 
+			case 54 : 
+				po.produire(BINCOND);
+				po.produire(-1);
+				pileRep.empiler(po.getIpo());
+				break;
             case 255 :
-            	afftabSymb(); // affichage de la table des symboles en fin de compilation
             	po.constObj();
             	po.constGen();
             	break;

@@ -1,0 +1,43 @@
+FICHIER test/proc2.gen : 
+
+   1  reserver        5
+   3  bincond        59
+   5  empiler         0
+   7  contenul        0   0
+  10  contenul        0   0
+  13  mul       
+  14  affecterl       1   1
+  17  retour          2
+  19  empiler         2
+  21  contenul        2   0
+  24  contenul        0   0
+  27  sous      
+  28  empileradl      7   0
+  31  appel           5   2
+  34  contenul        3   0
+  37  contenul        1   0
+  40  sous      
+  41  empileradl      8   0
+  44  appel           5   2
+  47  contenul        7   0
+  50  contenul        8   0
+  53  add       
+  54  affecterl       4   1
+  57  retour          5
+  59  lirent    
+  60  affecterg       0
+  62  lirent    
+  63  affecterg       1
+  65  lirent    
+  66  affecterg       2
+  68  lirent    
+  69  affecterg       3
+  71  contenug        0
+  73  contenug        1
+  75  contenug        2
+  77  contenug        3
+  79  empileradg      4
+  81  appel          19   5
+  84  contenug        4
+  86  ecrent    
+  87  arret     
