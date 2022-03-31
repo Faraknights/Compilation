@@ -1,0 +1,2 @@
+- Correction des conditions qui avait un problème dans le dernier dépôt
+- Ajout des procédures - Normalement fonctionnelles, elles passent les tests que nous avons mit en place.
