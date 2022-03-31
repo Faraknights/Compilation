@@ -638,6 +638,20 @@ public class PtGen {
 				po.produire(-1);
 				pileRep.empiler(po.getIpo());
 				break;
+			case 56 : 
+				desc.ajoutRef(UtilLex.chaineIdent(UtilLex.numIdCourant));
+				
+				placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, desc.getNbRef());
+				placeIdent(-1, PRIVEE, NEUTRE, -1);
+				
+				bc = it + 1;
+				break;
+			case 57 : 
+				placeIdent(-1, PARAMFIXE, tCour, -1);// à modifier l'info, mettre le compteur
+				break;
+			case 58 : 
+				placeIdent(-1, PROC, NEUTRE, desc.getNbRef());
+				break;
             case 255 :
             	po.constObj();
             	po.constGen();

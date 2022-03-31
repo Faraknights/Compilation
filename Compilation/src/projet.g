@@ -57,11 +57,11 @@ partiedef
   : 'def' ident  (',' ident )* ptvg
   ;
   
-partieref: 'ref'  specif (',' specif)* ptvg
+partieref: 'ref' specif (',' specif)*  ptvg
   ;
   
-specif  : ident  ( 'fixe' '(' type  ( ',' type  )* ')' )? 
-                 ( 'mod'  '(' type  ( ',' type  )* ')' )? 
+specif  : ident {PtGen.pt(56);} ( 'fixe' '(' type {PtGen.pt(57);} ( ',' type {PtGen.pt(57);} )* ')' )? 
+                                ( 'mod'  '(' type {PtGen.pt(58);} ( ',' type {PtGen.pt(58);} )* ')' )? 
   ;
   
 consts  : 'const' ( ident {PtGen.pt(1);} '=' valeur {PtGen.pt(2);} ptvg  )+ 
