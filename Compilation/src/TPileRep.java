@@ -8,8 +8,8 @@ public class TPileRep {
 
     
     	private final int MAXPILEREP=50;
-    	private int ip; // sommet de pile
-    	private int [] T = new int [MAXPILEREP+1];
+    	public int ip; // sommet de pile
+    	public Integer [] T = new Integer [MAXPILEREP+1];
     	
     	public void empiler(int x) {
     		if (ip==MAXPILEREP) 

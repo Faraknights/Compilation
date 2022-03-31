@@ -262,8 +262,10 @@ public class PtGen {
 				iterateurDesVariables++;
 				break;
 			case 27: 
-				po.produire(RESERVER);
-				po.produire(iterateurDesVariables);
+				if(iterateurDesVariables > 0) {
+					po.produire(RESERVER);
+					po.produire(iterateurDesVariables);
+				}
 				break;
 			// TYPES
 			case 4: 
@@ -483,12 +485,14 @@ public class PtGen {
 			//condition - cond
 			case 39: 
 				pileRep.empiler(-2);
+				System.out.println("1 - " + pileRep.ip + " - " + Arrays.deepToString(pileRep.T));
 				break; 
 			//condition - finExpr
 			case 40: 
 				po.produire(BSIFAUX);
 				po.produire(-1);
 				pileRep.empiler(po.getIpo());
+				System.out.println("2 - " + pileRep.ip + " - " + Arrays.deepToString(pileRep.T));
 				break;
 			//condition - finExpr
 			case 41: 
@@ -496,16 +500,21 @@ public class PtGen {
 				po.produire(BINCOND);
 				po.produire(pileRep.depiler());
 				pileRep.empiler(po.getIpo());
+				System.out.println("3 - " + pileRep.ip + " - " + Arrays.deepToString(pileRep.T));
+				break; 
+			case 55: 
+				po.modifier(pileRep.depiler(), po.getIpo() + 1);
 				break; 
 			//condition - fincond
 			case 42: 
-				po.modifier(pileRep.depiler(), po.getIpo() + 1);
+				System.out.println("4 - " + pileRep.ip + " - " + Arrays.deepToString(pileRep.T));
 				ipotmp = pileRep.depiler();
 				while (ipotmp != -2) {
 					ipoprec = po.getElt(ipotmp);
 					po.modifier(ipotmp, po.getIpo() + 1);
 					ipotmp = ipoprec;
 				}
+				System.out.println("5 - " + pileRep.ip + " - " + Arrays.deepToString(pileRep.T));
 				break; 
 			//procedure
 			case 43: 
