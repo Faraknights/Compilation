@@ -266,6 +266,7 @@ public class PtGen {
 					po.produire(RESERVER);
 					po.produire(iterateurDesVariables);
 				}
+				desc.setTailleGlobaux(iterateurDesVariables);
 				break;
 			// TYPES
 			case 4: 
@@ -304,6 +305,7 @@ public class PtGen {
 				} else if(tabSymb[idIdent].categorie == VARGLOBALE) {
 					po.produire(CONTENUG);
 					po.produire(tabSymb[idIdent].info);
+					modifVecteurTrans(TRANSDON);
 				}  else if(tabSymb[idIdent].categorie == PARAMFIXE || tabSymb[idIdent].categorie == VARLOCALE) {
 					po.produire(CONTENUL);
 					po.produire(tabSymb[idIdent].info);
@@ -403,6 +405,7 @@ public class PtGen {
 				if(tabSymb[idIdent].categorie == VARGLOBALE) {
 					po.produire(AFFECTERG);
 					po.produire(tabSymb[idIdent].info);
+					modifVecteurTrans(TRANSDON);
 				} else if (tabSymb[idIdent].categorie == VARLOCALE) {
 					po.produire(AFFECTERL);
 					po.produire(tabSymb[idIdent].info);
@@ -453,12 +456,14 @@ public class PtGen {
 			case 33: 
 				po.produire(BSIFAUX);
 				po.produire(-1);
+				modifVecteurTrans(TRANSCODE);
 				pileRep.empiler(po.getIpo());
 				break;
 			//inssi - sinon
 			case 34: 
 				po.produire(BINCOND);
 				po.produire(-1);
+				modifVecteurTrans(TRANSCODE);
 				po.modifier(pileRep.depiler(), po.getIpo() + 1);
 				pileRep.empiler(po.getIpo());
 				break;
@@ -471,9 +476,10 @@ public class PtGen {
 				pileRep.empiler(po.getIpo() + 1);
 				break; 
 			//inssi - faire
-			case 37: 
+			case 37: //identique au gen 33 
 				po.produire(BSIFAUX);
 				po.produire(-1);
+				modifVecteurTrans(TRANSCODE);
 				pileRep.empiler(po.getIpo());
 				break; 
 			//inssi - fait
@@ -481,6 +487,7 @@ public class PtGen {
 				po.modifier(pileRep.depiler(), po.getIpo() + 3);
 				po.produire(BINCOND);
 				po.produire(pileRep.depiler());
+				modifVecteurTrans(TRANSCODE);
 				break; 
 			//condition - cond
 			case 39: 
@@ -491,6 +498,7 @@ public class PtGen {
 			case 40: 
 				po.produire(BSIFAUX);
 				po.produire(-1);
+				modifVecteurTrans(TRANSCODE);
 				pileRep.empiler(po.getIpo());
 				System.out.println("2 - " + pileRep.ip + " - " + Arrays.deepToString(pileRep.T));
 				break;
@@ -499,6 +507,7 @@ public class PtGen {
 				po.modifier(pileRep.depiler(), po.getIpo() + 3);
 				po.produire(BINCOND);
 				po.produire(pileRep.depiler());
+				modifVecteurTrans(TRANSCODE);
 				pileRep.empiler(po.getIpo());
 				System.out.println("3 - " + pileRep.ip + " - " + Arrays.deepToString(pileRep.T));
 				break; 
@@ -625,6 +634,7 @@ public class PtGen {
 				}
 				po.produire(APPEL);
 				po.produire(tabSymb[idVarAffectation].info);
+				modifVecteurTrans(REFEXT);
 				po.produire(tabSymb[idVarAffectation + 1].info);
 				break; 
 			case 53: 
@@ -636,32 +646,48 @@ public class PtGen {
 			case 54 : 
 				po.produire(BINCOND);
 				po.produire(-1);
+				modifVecteurTrans(TRANSCODE);
 				pileRep.empiler(po.getIpo());
 				break;
 			case 56 : 
+				//mettre erreur ident
 				desc.ajoutRef(UtilLex.chaineIdent(UtilLex.numIdCourant));
-				
 				placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, desc.getNbRef());
 				placeIdent(-1, PRIVEE, NEUTRE, -1);
-				
+				iterateurDesVariables = 0;
 				bc = it + 1;
 				break;
 			case 57 : 
-				placeIdent(-1, PARAMFIXE, tCour, -1);// à modifier l'info, mettre le compteur
+				placeIdent(-1, PARAMFIXE, tCour, iterateurDesVariables);// à modifier l'info, mettre le compteur
+				iterateurDesVariables++;
 				break;
 			case 58 : 
-				placeIdent(-1, PROC, NEUTRE, desc.getNbRef());
+				placeIdent(-1, PARAMMOD, tCour, iterateurDesVariables);
+				iterateurDesVariables++;
+				break;
+			case 59 : 
+				tabSymb[bc - 1].info = iterateurDesVariables;
+				desc.modifRefNbParam(desc.getNbRef(), iterateurDesVariables);
+				break;
+			case 60 : 
+				desc.setUnite("programme");
+				break;
+			case 61 : 
+				desc.setUnite("module");
+				break;
+			case 62 : 
+				desc.setTailleCode(po.getIpo());
 				break;
             case 255 :
             	po.constObj();
             	po.constGen();
             	break;
 
-		// TODO
-		
-		default:
-			System.out.println("Point de generation non prevu dans votre liste");
-			break;
+			// TODO
+			
+			default:
+				System.out.println("Point de generation non prevu dans votre liste");
+				break;
 
 		}
 	}
