@@ -133,6 +133,11 @@ public class Edl {
 		
 		for (int i = 0; i < nMod; i++) {
 			for (int j = 0; j < tabDesc[i].getNbDef(); j++) {
+				for (int k = 0; k < nbDicoDef; k++) {
+					if(DicoDef[k].nomProc == tabDesc[i].getDefNomProc(j)) {
+						erreur(NONFATALE, "fonction " + DicoDef[k].nomProc + " défini plusieurs fois");
+					}
+				}
 				DicoDef[nbDicoDef] = new EltDef( tabDesc[i].getDefNomProc(j), 
 												 tabDesc[i].getDefAdPo(j) + transCode[i], 
 												 tabDesc[i].getDefNbParam(j)
@@ -140,7 +145,24 @@ public class Edl {
 			}
 		}
 		
-
+		int[][] adFinale = new int[5][10];
+		
+		for (int i = 0; i < nMod; i++) {
+			for (int j = 0; j < tabDesc[i].getNbRef(); j++) {
+				String tmp = tabDesc[i].getRefNomProc(j);
+				boolean isDefined = false;
+				for (int k = 0; k < nbDicoDef; k++) {
+					if(DicoDef[k].nomProc == tmp) {
+						isDefined = true;
+						adFinale[i][j] = DicoDef[k].adPo;
+					}
+				}
+				if(!isDefined) {
+					erreur(NONFATALE, "fonction " + tmp + " défini mais non référencé");
+				}
+			}
+		}
+		
 		if (nbErr > 0) {
 			System.out.println("programme executable non produit");
 			System.exit(1);
