@@ -28,6 +28,20 @@ public class Edl {
 	//TODO : declarations de variables A COMPLETER SI BESOIN
 	static int ipo, nMod, nbErr;
 	static String nomProg;
+	
+	static class EltDef {
+		// nomProc = nom de la procedure definie en DEF
+		public String nomProc;
+		// adPo = adresse de debut de code de cette procedure
+		// nbParam =  nombre de parametres de cette procedure
+		public int adPo, nbParam;
+
+		public EltDef(String nomProc, int adPo, int nbParam) {
+			this.nomProc = nomProc;
+			this.adPo = adPo;
+			this.nbParam = nbParam;
+		}
+	}
 
 
 	// utilitaire de traitement des erreurs
@@ -100,10 +114,32 @@ public class Edl {
 		// -----------------------------
 		lireDescripteurs();		//TODO : lecture des descripteurs a completer si besoin
 
-		//TODO : ... A COMPLETER ...
-		// 
-		// 
-		//
+		int[] transDon = new int[nMod];
+		int[] transCode = new int[nMod];
+		
+		transDon[0] = 0;
+		transCode[0] = 0;
+
+		for (int i = 1; i < nMod; i++) {
+			transDon[i] = transDon[i - 1] + tabDesc[i - 1].getTailleGlobaux();
+		}
+
+		for (int i = 1; i < nMod; i++) {
+			transDon[i] = transDon[i - 1] + tabDesc[i - 1].getTailleCode();
+		}
+
+		EltDef[] DicoDef = new EltDef[MAXDEF];
+		int nbDicoDef = 0;
+		
+		for (int i = 0; i < nMod; i++) {
+			for (int j = 0; j < tabDesc[i].getNbDef(); j++) {
+				DicoDef[nbDicoDef] = new EltDef( tabDesc[i].getDefNomProc(j), 
+												 tabDesc[i].getDefAdPo(j) + transCode[i], 
+												 tabDesc[i].getDefNbParam(j)
+											   );
+			}
+		}
+		
 
 		if (nbErr > 0) {
 			System.out.println("programme executable non produit");
