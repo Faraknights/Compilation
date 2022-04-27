@@ -713,6 +713,7 @@ public class PtGen {
             case 255 :
             	po.constObj();
             	po.constGen();
+            	desc.ecrireDesc(UtilLex.nomSource);
             	break;
 
 			// TODO

@@ -163,6 +163,12 @@ public class Edl {
 			}
 		}
 		
+		for (int i = 0; i < adFinale.length; i++) {
+			for (int j = 0; j < adFinale[i].length; j++) {
+				System.out.println(i + " " + j + " - ref : " + adFinale[i][j]);
+			}
+		}
+		
 		if (nbErr > 0) {
 			System.out.println("programme executable non produit");
 			System.exit(1);

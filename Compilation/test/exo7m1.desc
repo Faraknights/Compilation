@@ -1,0 +1,12 @@
+FICHIER test/exo7m1.desc :
+
+unite          module
+tailleCode     34
+tailleGlobaux  2
+nbDef          1
+nbRef          1
+nbTransExt     4
+tabDef          
+    ajout  5  1
+tabRef          
+    init  1

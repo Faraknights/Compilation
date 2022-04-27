@@ -1,0 +1,12 @@
+FICHIER test/exo7p.desc :
+
+unite          programme
+tailleCode     26
+tailleGlobaux  2
+nbDef          0
+nbRef          2
+nbTransExt     3
+tabDef          
+tabRef          
+    init  1
+    ajout  1
