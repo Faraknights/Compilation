@@ -40,7 +40,7 @@ unite  :   unitprog {PtGen.pt(255);} EOF
   
 unitprog
   : 'programme' {PtGen.pt(60);} ident ':'  
-     declarations  
+     declarations
      corps {PtGen.pt(62);} { System.out.println("succes, arret de la compilation "); }
   ;
   
@@ -54,7 +54,7 @@ declarations
   ;
   
 partiedef
-  : 'def' ident  (',' ident )* ptvg
+  : 'def' ident {PtGen.pt(63);} (',' ident {PtGen.pt(63);} )* ptvg
   ;
   
 partieref: 'ref' specif (',' specif)*  ptvg

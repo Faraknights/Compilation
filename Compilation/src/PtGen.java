@@ -138,6 +138,7 @@ public class PtGen {
 	private static int iterateurDesProc;
 	private static int idVarAffectation;
 	private static int nbParamAppel;
+	private static int idDef;
 	
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
@@ -207,6 +208,7 @@ public class PtGen {
 		iterateurDesVariables = 0;
 		iterateurDesProc = 0;
 		nbParamAppel = 0;
+		idDef = 0;
 		
 		// pile des reprises pour compilation des branchements en avant
 		pileRep = new TPileRep(); 
@@ -322,9 +324,7 @@ public class PtGen {
 				break;
 			// EXP5
 			case 12: 
-				if(tCour != ENT) {
-					UtilLex.messErr("Mauvais type, type attendu : ENT.");
-				}
+				verifEnt();
 				break;
 			case 13: 
 				po.produire(MUL);
@@ -370,9 +370,7 @@ public class PtGen {
 				break;
 			//EXP2
 			case 23: 
-				if(tCour != BOOL) {
-					UtilLex.messErr("Mauvais type, type attendu : BOOL.");
-				}
+				verifBool();
 				break;
 			case 24: 
 				po.produire(NON);
@@ -530,8 +528,16 @@ public class PtGen {
 				if(presentIdent(bc) != 0) {
 					UtilLex.messErr("Identifiant deja utilise");
 				}
+				idDef = desc.presentDef(UtilLex.chaineIdent(UtilLex.numIdCourant));
+				if(idDef != 0){
+					desc.modifDefAdPo(idDef, po.getIpo() + 1);
+				}
 				placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo() + 1);
-				placeIdent(-1, PRIVEE, NEUTRE, -1);
+				if(idDef != 0) {
+					placeIdent(-1, DEF, NEUTRE, -1);
+				} else {
+					placeIdent(-1, PRIVEE, NEUTRE, -1);
+				}
 				bc = it + 1;
 				iterateurDesProc = 0;
 				break; 
@@ -551,6 +557,9 @@ public class PtGen {
 				break; 
 			case 46: 
 				tabSymb[bc - 1].info = iterateurDesProc;
+				if(idDef != 0) {
+					desc.modifDefNbParam(idDef, iterateurDesProc);
+				}
 				iterateurDesVariables=0;
 				iterateurDesProc+=2;
 				break;
@@ -649,11 +658,12 @@ public class PtGen {
 				modifVecteurTrans(TRANSCODE);
 				pileRep.empiler(po.getIpo());
 				break;
+			//Refs
 			case 56 : 
 				//mettre erreur ident
 				desc.ajoutRef(UtilLex.chaineIdent(UtilLex.numIdCourant));
 				placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, desc.getNbRef());
-				placeIdent(-1, PRIVEE, NEUTRE, -1);
+				placeIdent(-1, REF, NEUTRE, -1);
 				iterateurDesVariables = 0;
 				bc = it + 1;
 				break;
@@ -669,14 +679,36 @@ public class PtGen {
 				tabSymb[bc - 1].info = iterateurDesVariables;
 				desc.modifRefNbParam(desc.getNbRef(), iterateurDesVariables);
 				break;
+			//Finrefs
+				
+			//Descripteur Unite
 			case 60 : 
 				desc.setUnite("programme");
 				break;
 			case 61 : 
 				desc.setUnite("module");
 				break;
+			//Descripteur tailleCode
 			case 62 : 
+				//gestion d'erreur, si une fonction est dans tabDef mais n'est jamais déclaré
+				for (int i = 1; i <= desc.getNbDef(); i++) {
+					boolean isDefined = false;
+					for (int j = 1; j < tabSymb.length; j++) {
+						if(tabSymb[j].categorie == DEF) {
+							if(tabSymb[j-1].info == desc.getDefAdPo(i)) {
+								isDefined = true;
+								break;
+							}
+						}
+					}
+					if(!isDefined) {
+						UtilLex.messErr("Fonction définie mais non déclarée.");
+					}
+				}
 				desc.setTailleCode(po.getIpo());
+				break;
+			case 63 : 
+				desc.ajoutDef(UtilLex.chaineIdent(UtilLex.numIdCourant));
 				break;
             case 255 :
             	po.constObj();
