@@ -35,7 +35,7 @@ catch (RecognitionException e) {reportError (e) ; throw e ; }}
 
 
 unite  :   unitprog {PtGen.pt(255);} EOF 
-      |    unitmodule  EOF
+      |    unitmodule {PtGen.pt(255);} EOF
   ;
   
 unitprog

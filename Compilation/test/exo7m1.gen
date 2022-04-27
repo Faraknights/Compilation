@@ -1,0 +1,17 @@
+FICHIER test/exo7m1.gen : 
+
+   1  reserver        2
+   3  bincond        35
+   5  reserver        0
+   7  contenul        0   0
+  10  empiler         0
+  12  eg        
+  13  bsifaux        23
+  15  empileradl      0   0
+  18  appel           1   1
+  21  bincond        33
+  23  contenul        0   0
+  26  contenul        0   0
+  29  add       
+  30  affecterl       0   0
+  33  retour          1

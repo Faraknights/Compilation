@@ -1,0 +1,7 @@
+FICHIER test/exo7m2.gen : 
+
+   1  bincond        12
+   3  reserver        0
+   5  empiler         0
+   7  affecterl       0   1
+  10  retour          1

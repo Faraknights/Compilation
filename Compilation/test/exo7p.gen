@@ -1,0 +1,12 @@
+FICHIER test/exo7p.gen : 
+
+   1  reserver        2
+   3  empileradl      0   0
+   6  appel           1   1
+   9  empiler         0
+  11  appel           2   1
+  14  empiler         3
+  16  affecterl       0   0
+  19  contenul        0   0
+  22  appel           2   1
+  25  retour          1
