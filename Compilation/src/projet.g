@@ -57,7 +57,7 @@ partiedef
   : 'def' ident {PtGen.pt(63);} (',' ident {PtGen.pt(63);} )* ptvg
   ;
   
-partieref: 'ref' specif (',' specif)*  ptvg
+partieref: 'ref' specif (',' specif)* {PtGen.pt(64);} ptvg
   ;
  
 specif  : ident {PtGen.pt(56);} ( 'fixe' '(' type {PtGen.pt(57);} ( ',' type {PtGen.pt(57);} )* ')' )? 
@@ -79,7 +79,7 @@ decprocs: {PtGen.pt(54);} (decproc ptvg)+ {PtGen.pt(53);}
   ;
   
 
-decproc :  'proc'  ident {PtGen.pt(43);} parfixe? parmod? {PtGen.pt(46);} consts? vars?  {PtGen.pt(47);} corps 
+decproc :  'proc'  ident {PtGen.pt(43);} parfixe? parmod? {PtGen.pt(46);} consts? vars? {PtGen.pt(47);} corps 
   ;
   
 ptvg  : ';'

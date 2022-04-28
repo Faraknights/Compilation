@@ -91,7 +91,7 @@ public class Edl {
 		if (f2 == null)
 			erreur(FATALE, "creation du fichier " + nomProg
 					+ ".map impossible");
-		// pour construire le code concatene de toutes les unités
+		// pour construire le code concatene de toutes les unitï¿½s
 		int[] po = new int[(nMod + 1) * MAXOBJ + 1];
 		
 		//TODO : ... A COMPLETER ...
@@ -114,64 +114,52 @@ public class Edl {
 		// -----------------------------
 		lireDescripteurs();		//TODO : lecture des descripteurs a completer si besoin
 
-		int[] transDon = new int[nMod];
-		int[] transCode = new int[nMod];
+		int[] transDon = new int[nMod+1];
+		int[] transCode = new int[nMod+1];
 		
 		transDon[0] = 0;
 		transCode[0] = 0;
 
-		for (int i = 1; i < nMod; i++) {
+		for (int i = 1; i <= nMod; i++) {
 			transDon[i] = transDon[i - 1] + tabDesc[i - 1].getTailleGlobaux();
+			transCode[i] = transCode[i - 1] + tabDesc[i - 1].getTailleCode();
 		}
-
-		for (int i = 1; i < nMod; i++) {
-			transDon[i] = transDon[i - 1] + tabDesc[i - 1].getTailleCode();
-		}
-
+		
 		EltDef[] DicoDef = new EltDef[MAXDEF];
 		int nbDicoDef = 0;
 		
-		for (int i = 0; i < nMod; i++) {
-			for (int j = 0; j < tabDesc[i].getNbDef(); j++) {
+		for (int i = 0; i <= nMod; i++) {
+			for (int j = 1; j <= tabDesc[i].getNbDef(); j++) {
 				for (int k = 0; k < nbDicoDef; k++) {
 					if(DicoDef[k].nomProc == tabDesc[i].getDefNomProc(j)) {
-						erreur(NONFATALE, "fonction " + DicoDef[k].nomProc + " défini plusieurs fois");
+						erreur(NONFATALE, "fonction " + DicoDef[k].nomProc + " defini plusieurs fois");
 					}
 				}
 				DicoDef[nbDicoDef] = new EltDef( tabDesc[i].getDefNomProc(j), 
 												 tabDesc[i].getDefAdPo(j) + transCode[i], 
 												 tabDesc[i].getDefNbParam(j)
 											   );
+				nbDicoDef++;
 			}
 		}
 		
 		int[][] adFinale = new int[5][10];
 		
-		for (int i = 0; i < nMod; i++) {
-			for (int j = 0; j < tabDesc[i].getNbRef(); j++) {
+		for (int i = 0; i <= nMod; i++) {
+			for (int j = 1; j <= tabDesc[i].getNbRef(); j++) {
 				String tmp = tabDesc[i].getRefNomProc(j);
 				boolean isDefined = false;
 				for (int k = 0; k < nbDicoDef; k++) {
-					if(DicoDef[k].nomProc == tmp) {
+					if(DicoDef[k].nomProc.equals(tmp)) {
 						isDefined = true;
 						adFinale[i][j] = DicoDef[k].adPo;
+						break;
 					}
 				}
 				if(!isDefined) {
-					erreur(NONFATALE, "fonction " + tmp + " défini mais non référencé");
+					erreur(NONFATALE, "fonction " + tmp + " defini mais non reference");
 				}
 			}
-		}
-		
-		for (int i = 0; i < adFinale.length; i++) {
-			for (int j = 0; j < adFinale[i].length; j++) {
-				System.out.println(i + " " + j + " - ref : " + adFinale[i][j]);
-			}
-		}
-		
-		if (nbErr > 0) {
-			System.out.println("programme executable non produit");
-			System.exit(1);
 		}
 
 		// Phase 2 de l'edition de liens

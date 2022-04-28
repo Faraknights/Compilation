@@ -1,8 +1,8 @@
 FICHIER test/exo7p.desc :
 
 unite          programme
-tailleCode     26
-tailleGlobaux  2
+tailleCode     22
+tailleGlobaux  1
 nbDef          0
 nbRef          2
 nbTransExt     3

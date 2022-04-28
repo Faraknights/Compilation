@@ -262,9 +262,10 @@ public class PtGen {
 					}
 				}
 				iterateurDesVariables++;
+				afftabSymb();
 				break;
 			case 27: 
-				if(iterateurDesVariables > 0) {
+				if(iterateurDesVariables != 0 || desc.getUnite() == "programme") {
 					po.produire(RESERVER);
 					po.produire(iterateurDesVariables);
 				}
@@ -564,8 +565,10 @@ public class PtGen {
 				iterateurDesProc+=2;
 				break;
 			case 47: 
-				po.produire(RESERVER);
-				po.produire(iterateurDesVariables);
+				if(iterateurDesVariables > 0) {
+					po.produire(RESERVER);
+					po.produire(iterateurDesVariables);
+				}
 				break; 
 			//fin
 			case 48: 
@@ -585,8 +588,7 @@ public class PtGen {
 					bc = 1;
 				} else {
 					po.produire(ARRET);
-				}
-            	afftabSymb(); // affichage de la table des symboles en fin de compilation
+				}// affichage de la table des symboles en fin de compilation
 				break; 
 			case 49: 
 				nbParamAppel = 0; 
@@ -647,16 +649,19 @@ public class PtGen {
 				po.produire(tabSymb[idVarAffectation + 1].info);
 				break; 
 			case 53: 
-            	afftabSymb(); // affichage de la table des symboles en fin de compilation
-				if(bc == 1) {
-					po.modifier(pileRep.depiler(), po.getIpo() + 1);
+				if(desc.getUnite() == "programme") {
+					if(bc == 1) {
+						po.modifier(pileRep.depiler(), po.getIpo() + 1);
+					}
 				}
 				break; 
 			case 54 : 
-				po.produire(BINCOND);
-				po.produire(-1);
-				modifVecteurTrans(TRANSCODE);
-				pileRep.empiler(po.getIpo());
+				if(desc.getUnite() == "programme") {
+					po.produire(BINCOND);
+					po.produire(-1);
+					modifVecteurTrans(TRANSCODE);
+					pileRep.empiler(po.getIpo());
+				}
 				break;
 			//Refs
 			case 56 : 
@@ -690,7 +695,7 @@ public class PtGen {
 				break;
 			//Descripteur tailleCode
 			case 62 : 
-				//gestion d'erreur, si une fonction est dans tabDef mais n'est jamais déclaré
+				//gestion d'erreur, si une fonction est dans tabDef mais n'est jamais dï¿½clarï¿½
 				for (int i = 1; i <= desc.getNbDef(); i++) {
 					boolean isDefined = false;
 					for (int j = 1; j < tabSymb.length; j++) {
@@ -702,7 +707,7 @@ public class PtGen {
 						}
 					}
 					if(!isDefined) {
-						UtilLex.messErr("Fonction définie mais non déclarée.");
+						UtilLex.messErr("Fonction dï¿½finie mais non dï¿½clarï¿½e.");
 					}
 				}
 				desc.setTailleCode(po.getIpo());
@@ -710,9 +715,14 @@ public class PtGen {
 			case 63 : 
 				desc.ajoutDef(UtilLex.chaineIdent(UtilLex.numIdCourant));
 				break;
+			case 64 : 
+				bc = 1;
+				iterateurDesVariables = 0;  
+				break;
             case 255 :
             	po.constObj();
             	po.constGen();
+            	afftabSymb(); 
             	desc.ecrireDesc(UtilLex.nomSource);
             	break;
 
