@@ -265,7 +265,7 @@ public class PtGen {
 				afftabSymb();
 				break;
 			case 27: 
-				if(iterateurDesVariables != 0 || desc.getUnite() == "programme") {
+				if(desc.getUnite() == "programme") {
 					po.produire(RESERVER);
 					po.produire(iterateurDesVariables);
 				}
@@ -441,6 +441,7 @@ public class PtGen {
 				if(tabSymb[idVarAffectation].categorie == VARGLOBALE) {
 					po.produire(AFFECTERG);
 					po.produire(tabSymb[idVarAffectation].info);
+					modifVecteurTrans(TRANSDON);
 				} else if (tabSymb[idVarAffectation].categorie == VARLOCALE) {
 					po.produire(AFFECTERL);
 					po.produire(tabSymb[idVarAffectation].info);
@@ -637,6 +638,7 @@ public class PtGen {
 				} else if(tabSymb[idIdent].categorie == VARGLOBALE) {
 					po.produire(EMPILERADG);
 					po.produire(tabSymb[idIdent].info);
+					modifVecteurTrans(TRANSDON);
 				}
 				break; 
 			case 52: 

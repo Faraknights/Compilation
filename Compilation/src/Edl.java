@@ -1,4 +1,6 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
  //TODO : Renseigner le champs auteur : Nom1_Prenom1_Nom2_Prenom2_Nom3_Prenom3
  /**
  * 
@@ -27,7 +29,14 @@ public class Edl {
 
 	//TODO : declarations de variables A COMPLETER SI BESOIN
 	static int ipo, nMod, nbErr;
+	static int nbPo;
 	static String nomProg;
+	static String[] fileNames = new String[MAXMOD + 1];
+	static int[] transDon;
+	static int[] transCode;
+	static EltDef[] DicoDef;
+	static int nbDicoDef;
+	static int[][] adFinale;
 	
 	static class EltDef {
 		// nomProc = nom de la procedure definie en DEF
@@ -67,6 +76,7 @@ public class Edl {
 		if (!tabDesc[0].getUnite().equals("programme"))
 			erreur(FATALE, "programme attendu");
 		nomProg = s;
+		fileNames[0] = s;
 
 		nMod = 0;
 		while (!s.equals("") && nMod < MAXMOD) {
@@ -75,6 +85,7 @@ public class Edl {
 			s = Lecture.lireString();
 			if (!s.equals("")) {
 				nMod = nMod + 1;
+				fileNames[nMod] = s;
 				tabDesc[nMod] = new Descripteur();
 				tabDesc[nMod].lireDesc(s);
 
@@ -91,13 +102,70 @@ public class Edl {
 		if (f2 == null)
 			erreur(FATALE, "creation du fichier " + nomProg
 					+ ".map impossible");
-		// pour construire le code concatene de toutes les unit�s
-		int[] po = new int[(nMod + 1) * MAXOBJ + 1];
+		// pour construire le code concatene de toutes les unites
+		int[] po = new int[/*(nMod + 1) * MAXOBJ + 1*/60];
+		ipo = 0;
 		
-		//TODO : ... A COMPLETER ...
-		// 
-		//
+		for (int i = 0; i <= nMod; i++) {
+			System.out.println(fileNames[i] + ".obj");
+			int[] tmpPo = new int[MAXOBJ];
+			nbPo = 0;
+			
+			
+			InputStream file = Lecture.ouvrir(fileNames[i] + ".obj");
+			InputStreamReader isr = new InputStreamReader(file, StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(isr);
 
+            String[][] tabTransExt = new String[50][2];
+            int nbTransExt = 0;
+            
+            for(Object line : br.lines().toArray()) {
+            	String tmpLine = (String)line;
+            	if(!tmpLine.contains(" ")) {
+                	tmpPo[nbPo] = Integer.parseInt(tmpLine);
+                	nbPo++;
+            	} else {
+            		tabTransExt[nbTransExt] = tmpLine.split("   ");
+            		nbTransExt++;
+            	}
+            }
+            
+            ipo += nbPo;
+
+            br = new BufferedReader(isr);
+            
+            System.out.println("test0");
+            
+            for (int j = 0; j < nbTransExt; j++) {
+                System.out.println("test");
+                switch (Integer.parseInt(tabTransExt[j][1])) {
+				case TRANSDON:
+					tmpPo[Integer.parseInt(tabTransExt[j][0])-1] += transDon[i];
+					break;
+				case TRANSCODE:
+					tmpPo[Integer.parseInt(tabTransExt[j][0])-1] += transCode[i];
+					break;
+				case REFEXT:
+					tmpPo[Integer.parseInt(tabTransExt[j][0])-1] = adFinale[i][tmpPo[Integer.parseInt(tabTransExt[j][0])-1]];
+					break;
+				default:
+					break;
+				}
+			}
+            
+            for (int j = transCode[i]; j < ipo; j++) {
+				po[j+1] = tmpPo[j - transCode[i]];
+			}
+		}
+		
+		po[2] = transDon[nMod] + tabDesc[nMod].getTailleGlobaux();
+		
+		System.out.println(ipo);
+		
+		
+		for (int i = 1; i <= ipo; i++) {
+			Ecriture.ecrireStringln(f2, "" + po[i]);
+		}
 		Ecriture.fermer(f2);
 
 		// creation du fichier en mnemonique correspondant
@@ -114,8 +182,8 @@ public class Edl {
 		// -----------------------------
 		lireDescripteurs();		//TODO : lecture des descripteurs a completer si besoin
 
-		int[] transDon = new int[nMod+1];
-		int[] transCode = new int[nMod+1];
+		transDon = new int[nMod+1];
+		transCode = new int[nMod+1];
 		
 		transDon[0] = 0;
 		transCode[0] = 0;
@@ -125,8 +193,8 @@ public class Edl {
 			transCode[i] = transCode[i - 1] + tabDesc[i - 1].getTailleCode();
 		}
 		
-		EltDef[] DicoDef = new EltDef[MAXDEF];
-		int nbDicoDef = 0;
+		DicoDef = new EltDef[MAXDEF];
+		nbDicoDef = 0;
 		
 		for (int i = 0; i <= nMod; i++) {
 			for (int j = 1; j <= tabDesc[i].getNbDef(); j++) {
@@ -143,7 +211,7 @@ public class Edl {
 			}
 		}
 		
-		int[][] adFinale = new int[5][10];
+		adFinale = new int[5][10];
 		
 		for (int i = 0; i <= nMod; i++) {
 			for (int j = 1; j <= tabDesc[i].getNbRef(); j++) {
