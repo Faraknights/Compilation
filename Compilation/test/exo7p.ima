@@ -1,0 +1,27 @@
+FICHIER test/exo7p.ima : 
+
+   1  reserver        2
+   3  empileradg      0
+   5  appel          48   1
+   8  empiler         0
+  10  appel          23   1
+  13  empiler         3
+  15  affecterg       0
+  17  contenug        0
+  19  appel          23   1
+  22  arret     
+  23  contenul        0   0
+  26  empiler         0
+  28  eg        
+  29  bsifaux        38
+  31  empileradg      1
+  33  appel          48   1
+  36  bincond        46
+  38  contenug        1
+  40  contenul        0   0
+  43  add       
+  44  affecterg       1
+  46  retour          1
+  48  empiler         0
+  50  affecterl       0   1
+  53  retour          1
